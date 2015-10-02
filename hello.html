@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>hello React</title>
+    <meta charset="utf-8">
+    <style type="text/css">
+        div.logger {
+            width: 300px;
+            height: 500px;
+            overflow: auto;
+            margin-bottom: 20px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>This logging information indicates the life cycle of the counter element.</h2>
+    <div id="app"></div>
+    <script type="text/javascript" src="./react/build/react.js"></script>
+    <script>
+    var logMixin = {
+        _log: function(methodName, args) {
+            var msg = this.name + "::" + methodName;
+            // console.log(msg, args);
+            if(document.getElementById("app") !== null && document.getElementsByClassName("logger").length >= 1) {
+                //这里如果能调用一个logger.update(msg)就好了。。
+                var p = document.createElement('p');
+                p.innerText = msg;
+                var logger = document.getElementsByClassName("logger")[0]
+                logger.appendChild(p);
+                logger.scrollTop !== undefined && (logger.scrollTop = logger.scrollHeight);
+            }
+
+        },
+
+        componentWillUpdate: function() {
+            this._log('componentWillUpdate', arguments);
+        },
+        componentDidUpdate: function() {
+            this._log('componentDidUpdate', arguments);
+        },
+        componentWillMount: function() {
+            this._log('componentWillMount', arguments);
+        },
+        componentDidMount: function() {
+            this._log('componentDidMount', arguments);
+        },
+        componentWillUnmount: function() {
+            this._log('componentWillUnmount', arguments);
+        },
+    }
+
+    var Counter = React.createClass({
+
+        name: 'Counter',
+        mixins: [logMixin],
+
+        propTypes: {
+            count: React.PropTypes.number.isRequired,
+        },
+
+
+        render: function() {
+            return React.DOM.span(null, this.props.count);
+        }
+    });
+
+
+    var Logger = React.createClass({
+        name: 'Logger',
+        render: function() {
+            var divv = React.DOM.div({
+                className: "logger",
+            });
+            return divv;
+        }
+    })
+
+    var TextAreaCounter = React.createClass({
+
+        getInitialState: function() {
+            return {
+                text: this.props.text
+            }
+        },
+
+        propTypes: {
+            text: React.PropTypes.string
+        },
+
+        _textChange: function(ev) {
+            this.setState({
+                text: ev.target.value
+            });
+            // console.log(ev.target.value);
+        },
+
+        render: function() {
+
+            var counter = null;
+            if (this.state.text.length > 0) {
+                counter = React.DOM.h3(null,
+                    React.createElement(Counter, {
+                        count: this.state.text.length
+                    })
+                );
+            }
+
+            var logger = React.createElement(Logger);
+
+            return React.DOM.div(null,
+                logger,
+                React.DOM.textarea({
+                    value: this.state.text,
+                    onChange: this._textChange
+                }),
+                counter
+            );
+        }
+    });
+
+
+    React.render(
+        React.createElement(TextAreaCounter, {
+            text: "asdzxcqwe"
+        }),
+        document.getElementById("app")
+    );
+    </script>
+</body>
+
+</html>
